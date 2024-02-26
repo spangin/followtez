@@ -15,6 +15,12 @@ class FollowTez(sp.Contract):
         sp.result(self.data.stats.get_opt(address))
 
     
+    @sp.onchain_view()
+    def check(self, params):
+        sp.set_type(params, sp.TRecord(f = sp.TAddress, l = sp.TAddress))
+        sp.result(self.data.followers.contains(params))
+
+
     @sp.entry_point()
     def follow(self, address):
         sp.set_type(address, sp.TAddress)
