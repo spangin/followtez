@@ -18,10 +18,11 @@ def test():
     scenario += followtez
 
     followtez.follow(userA.address).run(sender = userC)
+    scenario.verify(followtez.check(sp.record(l = userA.address, f = userC.address)))
     followtez.follow(userA.address).run(sender = userC, valid = False)
     followtez.follow(userA.address).run(sender = userB)
     followtez.follow(userB.address).run(sender = userC)
     followtez.unfollow(userB.address).run(sender = userC)
     followtez.unfollow(userA.address).run(sender = userC)
     followtez.unfollow(userC.address).run(sender = userA, valid = False)
-
+    
