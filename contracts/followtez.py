@@ -1,6 +1,9 @@
 import smartpy as sp
 
 
+import smartpy as sp
+
+
 class FollowTez(sp.Contract):
 
     def __init__(self):
@@ -27,6 +30,7 @@ class FollowTez(sp.Contract):
         k = sp.local("k", sp.record(f = sp.sender, l = params.address))
         sp.if params.is_source:
             k.value.f = sp.source
+        sp.verify(k.value.f != k.value.l, message = "FOLLOWTEZ_ERR invalid param")
         sp.verify(~self.data.followers.contains(k.value), message = "FOLLOWTEZ_ERR already done")
         self.data.followers[k.value] = sp.unit
         sf = sp.local("sf", self.data.stats.get(k.value.f, default_value = sp.record(l = sp.nat(0), f = sp.nat(0))))
