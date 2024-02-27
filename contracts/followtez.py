@@ -17,33 +17,38 @@ class FollowTez(sp.Contract):
     
     @sp.onchain_view()
     def check(self, params):
-        sp.set_type(params, sp.TRecord(f = sp.TAddress, l = sp.TAddress))
         sp.result(self.data.followers.contains(params))
 
 
     @sp.entry_point()
-    def follow(self, address):
-        sp.set_type(address, sp.TAddress)
-        k = sp.local("k", sp.record(f = sp.source, l = address))
+    def follow(self, params):
+        sp.set_type(params.address, sp.TAddress)
+        sp.set_type(params.is_source, sp.TBool)
+        k = sp.local("k", sp.record(f = sp.sender, l = params.address))
+        sp.if params.is_source:
+            k.value.f = sp.source
         sp.verify(~self.data.followers.contains(k.value), message = "FOLLOWTEZ_ERR already done")
         self.data.followers[k.value] = sp.unit
-        sf = sp.local("sf", self.data.stats.get(sp.source, default_value = sp.record(l = sp.nat(0), f = sp.nat(0))))
+        sf = sp.local("sf", self.data.stats.get(k.value.f, default_value = sp.record(l = sp.nat(0), f = sp.nat(0))))
         sf.value.l += 1
-        self.data.stats[sp.source] = sf.value
-        sl = sp.local("sl", self.data.stats.get(address, default_value = sp.record(l = sp.nat(0), f = sp.nat(0))))
+        self.data.stats[k.value.f] = sf.value
+        sl = sp.local("sl", self.data.stats.get(k.value.l, default_value = sp.record(l = sp.nat(0), f = sp.nat(0))))
         sl.value.f += 1
-        self.data.stats[address] = sl.value
+        self.data.stats[k.value.l] = sl.value
 
-    
+
     @sp.entry_point()
-    def unfollow(self, address):
-        sp.set_type(address, sp.TAddress)
-        k = sp.local("k", sp.record(f = sp.source, l = address))
+    def unfollow(self, params):
+        sp.set_type(params.address, sp.TAddress)
+        sp.set_type(params.is_source, sp.TBool)
+        k = sp.local("k", sp.record(f = sp.sender, l = params.address))
+        sp.if params.is_source:
+            k.value.f = sp.source
         sp.verify(self.data.followers.contains(k.value), message = "FOLLOWTEZ_ERR not found")
         del self.data.followers[k.value]
-        sf = sp.local("sf", self.data.stats.get(sp.source, message = "FOLLOWTEZ_ERR no stats"))
+        sf = sp.local("sf", self.data.stats.get(k.value.f, message = "FOLLOWTEZ_ERR no stats"))
         sf.value.l = sp.as_nat(sf.value.l - 1)
-        self.data.stats[sp.source] = sf.value
-        sl = sp.local("sl", self.data.stats.get(address, message = "FOLLOWTEZ_ERR no stats"))
+        self.data.stats[k.value.f] = sf.value
+        sl = sp.local("sl", self.data.stats.get(k.value.l, message = "FOLLOWTEZ_ERR no stats"))
         sl.value.f = sp.as_nat(sl.value.f - 1)
-        self.data.stats[address] = sl.value
+        self.data.stats[k.value.l] = sl.value
