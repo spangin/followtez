@@ -19,6 +19,7 @@ def test():
 
     followtez.follow(address = userA.address, is_source = False).run(sender = userC)
     scenario.verify(followtez.check(sp.record(l = userA.address, f = userC.address)))
+    followtez.follow(address = userA.address, is_source = False).run(sender = userA, valid = False)
     followtez.follow(address = userA.address, is_source = False).run(sender = userC, valid = False)
     followtez.follow(address = userA.address, is_source = False).run(sender = userB)
     followtez.follow(address = userB.address, is_source = False).run(sender = userC)
