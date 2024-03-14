@@ -1,9 +1,6 @@
 import smartpy as sp
 
 
-import smartpy as sp
-
-
 class FollowTez(sp.Contract):
 
     def __init__(self):
