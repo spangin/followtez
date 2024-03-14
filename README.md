@@ -1,1 +1,1 @@
-# followtez
+# FollowTez
